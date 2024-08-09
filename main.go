@@ -26,9 +26,14 @@ func (c HelpCommand) CommandDescription() string {
 }
 func (c HelpCommand) Execute() error {
 	fmt.Println("Welcome to the Pokedex!")
-	fmt.Println("Usage:\n")
-	fmt.Println("help: Display ")
+	fmt.Println("Usage:")
+	fmt.Println()
 
+	for _, command := range commands {
+		fmt.Println(fmt.Sprintf("%s: %s", command.CommandName(), command.CommandDescription()))
+	}
+
+	fmt.Println()
 	return nil
 }
 
@@ -44,8 +49,7 @@ func (c ExitCommand) CommandDescription() string {
 	return c.description
 }
 func (c ExitCommand) Execute() error {
-	// [todo]: implement
-
+	running = false
 	return nil
 }
 
@@ -77,9 +81,15 @@ func main() {
 			continue
 		}
 
-		val := scanner.Text()
-		fmt.Println(val)
-		// running = false
+		key := scanner.Text()
+		command, ok := commands[key]
+
+		if !ok {
+			fmt.Println("command not found")
+			continue
+		}
+
+		command.Execute()
 	}
 
 }
