@@ -9,7 +9,8 @@ import (
 
 type Command interface {
 	execute() error
-	getBaseCmd() BaseCommand
+	getName() string
+	getDescription() string
 }
 type BaseCommand struct {
 	name        string
@@ -23,28 +24,34 @@ type ExitCommand struct {
 	BaseCommand
 }
 
+func (c HelpCommand) getName() string {
+	return c.BaseCommand.name
+}
+func (c HelpCommand) getDescription() string {
+	return c.BaseCommand.description
+}
 func (c HelpCommand) execute() error {
 	fmt.Println("Welcome to the Pokedex!")
 	fmt.Println("Usage:")
 	fmt.Println()
 
 	for _, command := range commands {
-		baseCmd := command.getBaseCmd()
-		fmt.Println(fmt.Sprintf("%s: %s", baseCmd.name, baseCmd.description))
+		fmt.Println(fmt.Sprintf("%s: %s", command.getName(), command.getDescription()))
 	}
 
 	fmt.Println()
 	return nil
 }
-func (c HelpCommand) getBaseCmd() BaseCommand {
-	return c.BaseCommand
+
+func (c ExitCommand) getName() string {
+	return c.BaseCommand.name
+}
+func (c ExitCommand) getDescription() string {
+	return c.BaseCommand.description
 }
 func (c ExitCommand) execute() error {
 	running = false
 	return nil
-}
-func (c ExitCommand) getBaseCmd() BaseCommand {
-	return c.BaseCommand
 }
 
 func commandExit() error {
