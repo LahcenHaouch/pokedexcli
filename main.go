@@ -8,49 +8,43 @@ import (
 )
 
 type Command interface {
-	CommandName() string
-	CommandDescription() string
-	Execute() error
+	execute() error
+	getBaseCmd() BaseCommand
 }
-
-type HelpCommand struct {
+type BaseCommand struct {
 	name        string
 	description string
 }
 
-func (c HelpCommand) CommandName() string {
-	return c.name
+type HelpCommand struct {
+	BaseCommand
 }
-func (c HelpCommand) CommandDescription() string {
-	return c.description
+type ExitCommand struct {
+	BaseCommand
 }
-func (c HelpCommand) Execute() error {
+
+func (c HelpCommand) execute() error {
 	fmt.Println("Welcome to the Pokedex!")
 	fmt.Println("Usage:")
 	fmt.Println()
 
 	for _, command := range commands {
-		fmt.Println(fmt.Sprintf("%s: %s", command.CommandName(), command.CommandDescription()))
+		baseCmd := command.getBaseCmd()
+		fmt.Println(fmt.Sprintf("%s: %s", baseCmd.name, baseCmd.description))
 	}
 
 	fmt.Println()
 	return nil
 }
-
-type ExitCommand struct {
-	name        string
-	description string
+func (c HelpCommand) getBaseCmd() BaseCommand {
+	return c.BaseCommand
 }
-
-func (c ExitCommand) CommandName() string {
-	return c.name
-}
-func (c ExitCommand) CommandDescription() string {
-	return c.description
-}
-func (c ExitCommand) Execute() error {
+func (c ExitCommand) execute() error {
 	running = false
 	return nil
+}
+func (c ExitCommand) getBaseCmd() BaseCommand {
+	return c.BaseCommand
 }
 
 func commandExit() error {
@@ -60,12 +54,16 @@ func commandExit() error {
 var running bool = true
 var commands map[string]Command = map[string]Command{
 	"help": HelpCommand{
-		name:        "help",
-		description: "Displays a help message",
+		BaseCommand: BaseCommand{
+			name:        "help",
+			description: "Displays a help message",
+		},
 	},
 	"exit": ExitCommand{
-		name:        "exit",
-		description: "Exit the Pokedex",
+		BaseCommand: BaseCommand{
+			name:        "exit",
+			description: "Exit the Pokedex",
+		},
 	},
 }
 
@@ -89,7 +87,7 @@ func main() {
 			continue
 		}
 
-		command.Execute()
+		command.execute()
 	}
 
 }
